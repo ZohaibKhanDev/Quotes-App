@@ -1,5 +1,6 @@
 package com.example.quotesapi
 
+import android.annotation.SuppressLint
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
@@ -28,12 +29,14 @@ import androidx.compose.material.icons.outlined.MoreVert
 import androidx.compose.material.icons.outlined.Search
 import androidx.compose.material.icons.outlined.Share
 import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.CenterAlignedTopAppBar
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Switch
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
@@ -199,10 +202,12 @@ fun Quotes(quotesItem: QuotesItem, navController: NavController, viewModel: Main
     var icon by remember {
         mutableStateOf(false)
     }
-    Card(modifier = Modifier
-        .wrapContentSize()
-        .padding(all = 6.dp)
-        .clickable { navController.navigate(bottomScreen.SecondScreen.route + "/${quotesItem.quote} /${quotesItem.author}") }
+    Card(
+        modifier = Modifier
+            .wrapContentSize()
+            .padding(all = 6.dp)
+            .clickable { navController.navigate(bottomScreen.SecondScreen.route + "/${quotesItem.quote} /${quotesItem.author}") },
+        elevation = CardDefaults.cardElevation(4.dp)
     ) {
         Column(
             modifier = Modifier
@@ -246,7 +251,6 @@ fun Quotes(quotesItem: QuotesItem, navController: NavController, viewModel: Main
         }
     }
 }
-
 
 
 @Composable
@@ -320,7 +324,8 @@ fun FavItem(fav: Fav) {
     Card(
         modifier = Modifier
             .wrapContentSize()
-            .padding(all = 6.dp)
+            .padding(all = 6.dp),
+        elevation = CardDefaults.cardElevation(4.dp)
     ) {
         Column(
             modifier = Modifier
@@ -333,8 +338,16 @@ fun FavItem(fav: Fav) {
                 verticalAlignment = Alignment.CenterVertically,
                 horizontalArrangement = Arrangement.Center
             ) {
-                Icon(imageVector = Icons.Default.FormatQuote, contentDescription = "", modifier = Modifier.rotate(180f))
-                Text(text = fav.titttle, fontSize = MaterialTheme.typography.bodyMedium.fontSize, fontWeight = FontWeight.W600)
+                Icon(
+                    imageVector = Icons.Default.FormatQuote,
+                    contentDescription = "",
+                    modifier = Modifier.rotate(180f)
+                )
+                Text(
+                    text = fav.titttle,
+                    fontSize = MaterialTheme.typography.bodyMedium.fontSize,
+                    fontWeight = FontWeight.W600
+                )
             }
 
             Spacer(modifier = Modifier.height(14.dp))
@@ -351,9 +364,60 @@ fun FavItem(fav: Fav) {
     }
 }
 
+@OptIn(ExperimentalMaterial3Api::class)
+@SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
 @Composable
 fun SettingScreen(navController: NavController) {
-    Text(text = "This is SettingScreen")
+    var switchState by remember {
+        mutableStateOf(false)
+    }
+
+    Scaffold(
+        topBar = {
+            CenterAlignedTopAppBar(
+                title = {
+                    Text(
+                        text = "Setting",
+                        fontSize = MaterialTheme.typography.titleLarge.fontSize,
+                        fontWeight = FontWeight.Bold
+                    )
+                },
+                colors = TopAppBarDefaults.topAppBarColors(Color(0XFF3492eb)),
+                modifier = Modifier.padding(bottom = 10.dp)
+            )
+        }
+    ) {
+        Card(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(
+                    top = it.calculateTopPadding(),
+                    start = 14.dp,
+                    end = 14.dp,
+                    bottom = 14.dp
+                ),
+            elevation = CardDefaults.cardElevation(4.dp)
+        ) {
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(all = 20.dp),
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.SpaceBetween
+            ) {
+                Text(
+                    text = "Dark Theme",
+                    fontSize = MaterialTheme.typography.titleLarge.fontSize,
+                    fontWeight = FontWeight.Bold
+                )
+
+                Switch(checked = switchState, onCheckedChange = {
+                    switchState = it
+                })
+            }
+        }
+    }
+
 
 }
 
