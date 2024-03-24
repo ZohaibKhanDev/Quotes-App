@@ -16,17 +16,16 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Favorite
+import androidx.compose.material.icons.filled.FormatQuote
 import androidx.compose.material.icons.filled.Home
 import androidx.compose.material.icons.outlined.FavoriteBorder
-import androidx.compose.material.icons.outlined.Home
 import androidx.compose.material.icons.outlined.MoreVert
 import androidx.compose.material.icons.outlined.Search
-import androidx.compose.material.icons.outlined.Settings
 import androidx.compose.material.icons.outlined.Share
 import androidx.compose.material3.Card
 import androidx.compose.material3.CenterAlignedTopAppBar
@@ -46,10 +45,15 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.rotate
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
+import androidx.room.Room
+import com.example.quotesapi.room.DataBase
+import com.example.quotesapi.room.Fav
 import com.example.quotesapi.ui.theme.QuotesApiTheme
 
 class MainActivity : ComponentActivity() {
@@ -57,7 +61,7 @@ class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContent {
-            NavGraph()
+            MainScreen()
         }
     }
 }
@@ -65,17 +69,50 @@ class MainActivity : ComponentActivity() {
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun Home(navController: NavController) {
-
+    val context = LocalContext.current
+    val db = Room.databaseBuilder(
+        context,
+        DataBase::class.java,
+        "demo.db"
+    ).allowMainThreadQueries()
+        .build()
     val viewModel = remember {
-        MainViewModel(repository = Repository())
+        MainViewModel(repository = Repository(db))
     }
     QuotesApiTheme {
-        val isQuotes by remember {
+        val isfav by remember {
             mutableStateOf(false)
         }
+
         var quotesData by remember {
             mutableStateOf<List<QuotesItem>?>(null)
         }
+        var favData by remember {
+            mutableStateOf<List<Fav>?>(null)
+        }
+
+        LaunchedEffect(key1 = isfav) {
+            viewModel.getAllFav()
+        }
+        val favState by viewModel.allFav.collectAsState()
+        when (favState) {
+            is ResultState.Error -> {
+                val error = (favState as ResultState.Error).error
+                Text(text = error.toString())
+            }
+
+            ResultState.Loading -> {
+                Box(modifier = Modifier.fillMaxWidth(), contentAlignment = Alignment.Center) {
+                    CircularProgressIndicator()
+                }
+            }
+
+            is ResultState.Success -> {
+                val success = (favState as ResultState.Success).repository
+                favData = success
+            }
+        }
+
         LaunchedEffect(key1 = Unit) {
             viewModel.getAllQuotes()
         }
@@ -96,7 +133,7 @@ fun Home(navController: NavController) {
                 val success = (state as ResultState.Success).repository
                 quotesData = success
                 quotesData?.let {
-                QuoteList(quotesData = it, navController = navController)
+                    QuoteList(quotesData = it, navController = navController, viewModel)
 
                 }
             }
@@ -107,7 +144,11 @@ fun Home(navController: NavController) {
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun QuoteList(quotesData: List<QuotesItem>,navController: NavController) {
+fun QuoteList(
+    quotesData: List<QuotesItem>,
+    navController: NavController,
+    viewModel: MainViewModel
+) {
     Scaffold(
         topBar = {
             CenterAlignedTopAppBar(title = {
@@ -145,20 +186,24 @@ fun QuoteList(quotesData: List<QuotesItem>,navController: NavController) {
             ) {
                 quotesData?.let {
                     items(it) { quote ->
-                        Quotes(quotesItem = quote, navController)
+                        Quotes(quotesItem = quote, navController, viewModel)
                     }
                 }
             }
         }
     }
 }
-@Composable
-fun Quotes(quotesItem: QuotesItem, navController: NavController) {
 
+@Composable
+fun Quotes(quotesItem: QuotesItem, navController: NavController, viewModel: MainViewModel) {
+    var icon by remember {
+        mutableStateOf(false)
+    }
     Card(modifier = Modifier
         .wrapContentSize()
         .padding(all = 6.dp)
-        .clickable { navController.navigate(Screen.Second.route + "/${quotesItem.quote} /${quotesItem.author}") }) {
+        .clickable { navController.navigate(bottomScreen.SecondScreen.route + "/${quotesItem.quote} /${quotesItem.author}") }
+    ) {
         Column(
             modifier = Modifier
                 .fillMaxWidth()
@@ -185,7 +230,14 @@ fun Quotes(quotesItem: QuotesItem, navController: NavController) {
                 verticalAlignment = Alignment.CenterVertically,
                 horizontalArrangement = Arrangement.spacedBy(10.dp)
             ) {
-                Icon(imageVector = Icons.Outlined.FavoriteBorder, contentDescription = "Favoritr")
+                Icon(
+                    imageVector = if (icon) Icons.Default.Favorite else Icons.Outlined.FavoriteBorder,
+                    contentDescription = "Favoritr",
+                    modifier = Modifier.clickable {
+                        val fav = Fav(null, quotesItem.quote, quotesItem.author)
+                        icon = !icon
+                        viewModel.Insert(fav)
+                    })
                 Spacer(modifier = Modifier.width(5.dp))
                 Icon(imageVector = Icons.Outlined.Share, contentDescription = "Share")
 
@@ -193,6 +245,116 @@ fun Quotes(quotesItem: QuotesItem, navController: NavController) {
 
         }
     }
+}
+
+
+
+@Composable
+fun FavouriteScreen(navController: NavController) {
+
+    BottomFav()
+
+
+}
+
+@Composable
+fun BottomFav() {
+    val context = LocalContext.current
+    val db = Room.databaseBuilder(
+        context,
+        DataBase::class.java,
+        "demo.db"
+    ).allowMainThreadQueries()
+        .build()
+    val repository = remember {
+        Repository(db)
+    }
+    val viewModel = remember {
+        MainViewModel(repository)
+    }
+    var favData by remember {
+        mutableStateOf<List<Fav>?>(null)
+    }
+    val isFav by remember {
+        mutableStateOf(false)
+    }
+    LaunchedEffect(key1 = isFav) {
+        viewModel.getAllFav()
+    }
+    val favState by viewModel.allFav.collectAsState()
+    when (favState) {
+        is ResultState.Error -> {
+            val error = (favState as ResultState.Error).error
+            Text(text = error.toString())
+        }
+
+        ResultState.Loading -> {
+            Box(modifier = Modifier.fillMaxWidth(), contentAlignment = Alignment.Center) {
+                CircularProgressIndicator()
+            }
+        }
+
+        is ResultState.Success -> {
+            val success = (favState as ResultState.Success).repository
+            favData = success
+        }
+    }
+
+    LazyColumn(
+        modifier = Modifier.fillMaxWidth(),
+        horizontalAlignment = Alignment.CenterHorizontally,
+        verticalArrangement = Arrangement.spacedBy(6.dp),
+        contentPadding = PaddingValues(top = 4.dp)
+    ) {
+        favData?.let {
+            items(it) { fav ->
+                FavItem(fav = fav)
+            }
+        }
+    }
+
+}
+
+@Composable
+fun FavItem(fav: Fav) {
+    Card(
+        modifier = Modifier
+            .wrapContentSize()
+            .padding(all = 6.dp)
+    ) {
+        Column(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(all = 12.dp),
+            verticalArrangement = Arrangement.Center,
+            horizontalAlignment = Alignment.CenterHorizontally
+        ) {
+            Row(
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.Center
+            ) {
+                Icon(imageVector = Icons.Default.FormatQuote, contentDescription = "", modifier = Modifier.rotate(180f))
+                Text(text = fav.titttle, fontSize = MaterialTheme.typography.bodyMedium.fontSize, fontWeight = FontWeight.W600)
+            }
+
+            Spacer(modifier = Modifier.height(14.dp))
+
+            Text(
+                text = fav.des,
+                fontSize = MaterialTheme.typography.titleMedium.fontSize,
+                fontWeight = FontWeight.Bold,
+
+                )
+
+
+        }
+    }
+}
+
+@Composable
+fun SettingScreen(navController: NavController) {
+    Text(text = "This is SettingScreen")
+
 }
 
 
