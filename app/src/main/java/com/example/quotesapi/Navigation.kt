@@ -1,6 +1,7 @@
 package com.example.quotesapi
 
 import android.annotation.SuppressLint
+import android.content.Context
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -46,6 +47,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.rotate
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
@@ -56,76 +58,65 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
+import com.example.quotesapi.ui.theme.QuotesApiTheme
 
-/*
-@Composable
-fun NavGraph() {
-    val navController = rememberNavController()
-    NavHost(navController = navController, startDestination = Screen.Home.route) {
-        composable(Screen.Home.route) {
-            Home(navController)
-        }
 
-        composable(
-            Screen.Second.route + "/{quotes}/{author}",
-            arguments = listOf(navArgument("quotes") {
-                type = NavType.StringType
-            }, navArgument("author") {
-                type = NavType.StringType
-            })
-        ) {
-            var quotes = it.arguments?.getString("quotes")
-            var author = it.arguments?.getString("author")
-            SecondScreen(navController = navController, quotes, author)
-        }
-
-        composable(Screen.Favraite.route) {
-
-        }
-        composable(Screen.Setting.route) {
-
-        }
-    }
-
-}
-*/
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
 @Composable
 fun MainScreen() {
-    val navController = rememberNavController()
-    Scaffold(bottomBar = { BottomNavigation(navController = navController) }) {
-        Navigation(navController = navController)
+    val context = LocalContext.current
+    val sharedPreferences = context.getSharedPreferences("prefs", Context.MODE_PRIVATE)
+
+    val isDarkValue = sharedPreferences.getBoolean("darkMode", false)
+    var switchState by remember {
+        mutableStateOf(isDarkValue)
+    }
+    QuotesApiTheme(darkTheme = switchState) {
+        val navController = rememberNavController()
+        Scaffold(bottomBar = { BottomNavigation(navController = navController) }) {
+            Navigation(navController = navController)
+        }
     }
 }
 
 @Composable
 fun Navigation(navController: NavHostController) {
 
-    NavHost(navController = navController, startDestination = bottomScreen.Home.route) {
-        composable(bottomScreen.Home.route) {
-            Home(navController)
-        }
-        composable(bottomScreen.SecondScreen.route +"/{quotes}/{author}",
-            arguments = listOf(
-                navArgument("quotes"){
-                    type= NavType.StringType
-                },
-                        navArgument("author"){
-                    type= NavType.StringType
-                }
-            )
-            ){
-            val quotes=it.arguments?.getString("quotes")
-            val author=it.arguments?.getString("author")
-            SecondScreen(navController = navController,quotes,author)
-        }
-        composable(bottomScreen.Favourite.route) {
-            FavouriteScreen(navController)
-        }
-        composable(bottomScreen.Setting.route) {
-            SettingScreen(navController)
+    val context = LocalContext.current
+    val sharedPreferences = context.getSharedPreferences("prefs", Context.MODE_PRIVATE)
+
+    val isDarkValue = sharedPreferences.getBoolean("darkMode", false)
+    var switchState by remember {
+        mutableStateOf(isDarkValue)
+    }
+    QuotesApiTheme(darkTheme = switchState) {
+        NavHost(navController = navController, startDestination = bottomScreen.Home.route) {
+            composable(bottomScreen.Home.route) {
+                Home(navController)
+            }
+            composable(bottomScreen.SecondScreen.route + "/{quotes}/{author}",
+                arguments = listOf(
+                    navArgument("quotes") {
+                        type = NavType.StringType
+                    },
+                    navArgument("author") {
+                        type = NavType.StringType
+                    }
+                )
+            ) {
+                val quotes = it.arguments?.getString("quotes")
+                val author = it.arguments?.getString("author")
+                SecondScreen(navController = navController, quotes, author)
+            }
+            composable(bottomScreen.Favourite.route) {
+                FavouriteScreen(navController)
+            }
+            composable(bottomScreen.Setting.route) {
+                SettingScreen(navController)
+            }
         }
     }
+
 
 }
 
@@ -176,35 +167,44 @@ fun BottomNavigation(navController: NavController) {
         bottomScreen.Favourite,
         bottomScreen.Setting
     )
+    val context = LocalContext.current
+    val sharedPreferences = context.getSharedPreferences("prefs", Context.MODE_PRIVATE)
 
-    NavigationBar(contentColor = Color.White) {
-        val navStack by navController.currentBackStackEntryAsState()
-        val current = navStack?.destination?.route
+    val isDarkValue = sharedPreferences.getBoolean("darkMode", false)
+    var switchState by remember {
+        mutableStateOf(isDarkValue)
+    }
+    QuotesApiTheme (darkTheme = switchState){
+        NavigationBar(contentColor = Color.White) {
+            val navStack by navController.currentBackStackEntryAsState()
+            val current = navStack?.destination?.route
 
-        items.forEach {
-            NavigationBarItem(selected = current == it.route,
-                onClick = {
-                    navController.navigate(it.route) {
-                        navController.graph.let {
-                            it.route?.let { it1 -> popUpTo(it1) }
-                            launchSingleTop = true
-                            restoreState = true
+            items.forEach {
+                NavigationBarItem(selected = current == it.route,
+                    onClick = {
+                        navController.navigate(it.route) {
+                            navController.graph.let {
+                                it.route?.let { it1 -> popUpTo(it1) }
+                                launchSingleTop = true
+                                restoreState = true
+                            }
                         }
-                    }
-                },
-                icon = {
-                    Image(
-                        imageVector = if (current == it.route) it.selectIcon else it.unselect,
-                        contentDescription = ""
-                    )
+                    },
+                    icon = {
+                        Image(
+                            imageVector = if (current == it.route) it.selectIcon else it.unselect,
+                            contentDescription = ""
+                        )
 
-                },
-                label = {
-                    Text(text = it.route)
-                }
-            )
+                    },
+                    label = {
+                        Text(text = it.route)
+                    }
+                )
+            }
         }
     }
+
 
 }
 
@@ -215,93 +215,103 @@ fun SecondScreen(navController: NavController, quotes: String?, author: String?)
     var icon by remember {
         mutableStateOf(false)
     }
-    Scaffold(topBar = {
-        CenterAlignedTopAppBar(title = {
-            Text(
-                text = "Quotes",
-                fontSize = MaterialTheme.typography.titleLarge.fontSize,
-                fontWeight = FontWeight.Bold
-            )
-        }, colors = TopAppBarDefaults.topAppBarColors(Color(0XFF5EEBFC)),
-            navigationIcon = {
-                Icon(
-                    imageVector = Icons.Default.ArrowBackIosNew,
-                    contentDescription = "",
-                    modifier = Modifier.clickable { navController.popBackStack() })
-            },
-            actions = {
-                Icon(imageVector = Icons.Filled.Search, contentDescription = "")
-                Spacer(modifier = Modifier.padding(10.dp))
-                Icon(imageVector = Icons.Filled.MoreVert, contentDescription = "")
+    val context = LocalContext.current
+    val sharedPreferences = context.getSharedPreferences("prefs", Context.MODE_PRIVATE)
 
-            }
-        )
-    }) {
-
-        Card(
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(10.dp)
-                .wrapContentHeight()
-
-        ) {
-            Column(
-                verticalArrangement = Arrangement.spacedBy(6.dp),
-                horizontalAlignment = Alignment.CenterHorizontally,
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(14.dp),
-
-                ) {
-
-
-                Row(
-                    verticalAlignment = Alignment.CenterVertically,
-                    horizontalArrangement = Arrangement.Center
-                ) {
-                    Icon(
-                        imageVector = Icons.Default.FormatQuote,
-                        contentDescription = "",
-                        Modifier.rotate(180f)
-                    )
-                    Text(
-                        text = "$quotes",
-                        fontSize = MaterialTheme.typography.bodyLarge.fontSize,
-
-                        )
-                }
-
-                Spacer(modifier = Modifier.height(10.dp))
-
-                Text(
-                    text = ("$author"),
-                    fontSize = MaterialTheme.typography.titleLarge.fontSize,
-                    fontWeight = FontWeight.Bold,
-                )
-
-                Spacer(modifier = Modifier.height(10.dp))
-
-                Row(
-                    modifier = Modifier.padding(10.dp),
-                    verticalAlignment = Alignment.CenterVertically,
-                    horizontalArrangement = Arrangement.spacedBy(10.dp)
-                ) {
-                    Icon(
-                        imageVector = if (icon) Icons.Filled.Favorite else Icons.Outlined.FavoriteBorder,
-                        contentDescription = "Favorite",
-                        modifier = Modifier.clickable { icon = !icon }
-                    )
-
-                    Spacer(modifier = Modifier.padding(10.dp))
-                    Icon(
-                        imageVector = Icons.Outlined.Share,
-                        contentDescription = "Share",
-                        modifier = Modifier.clickable { })
-
-                }
-
-            }
-        }
-
+    val isDarkValue = sharedPreferences.getBoolean("darkMode", false)
+    var switchState by remember {
+        mutableStateOf(isDarkValue)
     }
+    QuotesApiTheme(darkTheme = switchState) {
+        Scaffold(topBar = {
+            CenterAlignedTopAppBar(title = {
+                Text(
+                    text = "Quotes",
+                    fontSize = MaterialTheme.typography.titleLarge.fontSize,
+                    fontWeight = FontWeight.Bold
+                )
+            }, colors = TopAppBarDefaults.topAppBarColors(Color(0XFF5EEBFC)),
+                navigationIcon = {
+                    Icon(
+                        imageVector = Icons.Default.ArrowBackIosNew,
+                        contentDescription = "",
+                        modifier = Modifier.clickable { navController.popBackStack() })
+                },
+                actions = {
+                    Icon(imageVector = Icons.Filled.Search, contentDescription = "")
+                    Spacer(modifier = Modifier.padding(10.dp))
+                    Icon(imageVector = Icons.Filled.MoreVert, contentDescription = "")
+
+                }
+            )
+        }) {
+
+            Card(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .padding(10.dp)
+                    .wrapContentHeight()
+
+            ) {
+                Column(
+                    verticalArrangement = Arrangement.spacedBy(6.dp),
+                    horizontalAlignment = Alignment.CenterHorizontally,
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(14.dp),
+
+                    ) {
+
+
+                    Row(
+                        verticalAlignment = Alignment.CenterVertically,
+                        horizontalArrangement = Arrangement.Center
+                    ) {
+                        Icon(
+                            imageVector = Icons.Default.FormatQuote,
+                            contentDescription = "",
+                            Modifier.rotate(180f)
+                        )
+                        Text(
+                            text = "$quotes",
+                            fontSize = MaterialTheme.typography.bodyLarge.fontSize,
+
+                            )
+                    }
+
+                    Spacer(modifier = Modifier.height(10.dp))
+
+                    Text(
+                        text = ("$author"),
+                        fontSize = MaterialTheme.typography.titleLarge.fontSize,
+                        fontWeight = FontWeight.Bold,
+                    )
+
+                    Spacer(modifier = Modifier.height(10.dp))
+
+                    Row(
+                        modifier = Modifier.padding(10.dp),
+                        verticalAlignment = Alignment.CenterVertically,
+                        horizontalArrangement = Arrangement.spacedBy(10.dp)
+                    ) {
+                        Icon(
+                            imageVector = if (icon) Icons.Filled.Favorite else Icons.Outlined.FavoriteBorder,
+                            contentDescription = "Favorite",
+                            modifier = Modifier.clickable { icon = !icon }
+                        )
+
+                        Spacer(modifier = Modifier.padding(10.dp))
+                        Icon(
+                            imageVector = Icons.Outlined.Share,
+                            contentDescription = "Share",
+                            modifier = Modifier.clickable { })
+
+                    }
+
+                }
+            }
+
+        }
+    }
+
 }

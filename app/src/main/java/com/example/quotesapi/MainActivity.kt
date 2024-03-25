@@ -1,9 +1,15 @@
 package com.example.quotesapi
 
 import android.annotation.SuppressLint
+import android.content.Context
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.core.LinearEasing
+import androidx.compose.animation.core.tween
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -20,10 +26,15 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.staggeredgrid.LazyVerticalStaggeredGrid
+import androidx.compose.foundation.lazy.staggeredgrid.StaggeredGridCells
+import androidx.compose.foundation.lazy.staggeredgrid.items
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Favorite
+import androidx.compose.material.icons.filled.FormatListNumberedRtl
 import androidx.compose.material.icons.filled.FormatQuote
 import androidx.compose.material.icons.filled.Home
+import androidx.compose.material.icons.filled.List
 import androidx.compose.material.icons.outlined.FavoriteBorder
 import androidx.compose.material.icons.outlined.MoreVert
 import androidx.compose.material.icons.outlined.Search
@@ -64,9 +75,22 @@ class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContent {
-            MainScreen()
+            val sharedPreferences = getSharedPreferences("prefs", Context.MODE_PRIVATE)
+
+            val isDarkValue = sharedPreferences.getBoolean("darkMode", false)
+            var switchState by remember {
+                mutableStateOf(isDarkValue)
+            }
+            QuotesApiTheme(darkTheme = switchState) {
+                MainScreen()
+            }
         }
     }
+
+    override fun onStart() {
+        super.onStart()
+    }
+
 }
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -82,7 +106,13 @@ fun Home(navController: NavController) {
     val viewModel = remember {
         MainViewModel(repository = Repository(db))
     }
-    QuotesApiTheme {
+    val sharedPreferences = context.getSharedPreferences("prefs", Context.MODE_PRIVATE)
+
+    val isDarkValue = sharedPreferences.getBoolean("darkMode", false)
+    var switchState by remember {
+        mutableStateOf(isDarkValue)
+    }
+    QuotesApiTheme(darkTheme = switchState) {
         val isfav by remember {
             mutableStateOf(false)
         }
@@ -152,49 +182,100 @@ fun QuoteList(
     navController: NavController,
     viewModel: MainViewModel
 ) {
-    Scaffold(
-        topBar = {
-            CenterAlignedTopAppBar(title = {
-                Text(
-                    text = "Quotes",
-                    fontSize = MaterialTheme.typography.titleLarge.fontSize,
-                    fontWeight = FontWeight.Bold
-                )
-            },
-                colors = TopAppBarDefaults.topAppBarColors(Color(0XFF5EEBFC)),
-                navigationIcon = {
-                    Icon(
-                        imageVector = Icons.Default.Home,
-                        contentDescription = "",
-                        modifier = Modifier.size(35.dp)
+    var list by remember {
+        mutableStateOf(true)
+    }
+    val context = LocalContext.current
+    val sharedPreferences = context.getSharedPreferences("prefs", Context.MODE_PRIVATE)
+
+    val isDarkValue = sharedPreferences.getBoolean("darkMode", false)
+    var switchState by remember {
+        mutableStateOf(isDarkValue)
+    }
+    QuotesApiTheme(darkTheme = switchState) {
+        Scaffold(
+            topBar = {
+                CenterAlignedTopAppBar(title = {
+                    Text(
+                        text = "Quotes",
+                        fontSize = MaterialTheme.typography.titleLarge.fontSize,
+                        fontWeight = FontWeight.Bold
                     )
                 },
-                actions = {
-                    Icon(imageVector = Icons.Outlined.Search, contentDescription = "")
-                    Spacer(modifier = Modifier.padding(10.dp))
-                    Icon(imageVector = Icons.Outlined.MoreVert, contentDescription = "")
-                })
-        },
-    ) {
-        Column(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(top = it.calculateTopPadding())
+                    colors = TopAppBarDefaults.topAppBarColors(Color(0XFF5EEBFC)),
+                    navigationIcon = {
+                        Icon(
+                            imageVector = Icons.Default.Home,
+                            contentDescription = "",
+                            modifier = Modifier.size(35.dp)
+                        )
+                    },
+                    actions = {
+
+                        Icon(
+                            imageVector = if (list) Icons.Default.List else Icons.Default.FormatListNumberedRtl,
+                            contentDescription = "", modifier = Modifier.clickable { list=!list }
+                        )
+                        Icon(imageVector = Icons.Outlined.Search, contentDescription = "")
+
+
+                        Icon(imageVector = Icons.Outlined.MoreVert, contentDescription = "")
+
+
+                    })
+            },
         ) {
-            LazyColumn(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalAlignment = Alignment.CenterHorizontally,
-                verticalArrangement = Arrangement.spacedBy(6.dp),
-                contentPadding = PaddingValues(top = 4.dp)
-            ) {
-                quotesData?.let {
-                    items(it) { quote ->
-                        Quotes(quotesItem = quote, navController, viewModel)
+
+            if (list) {
+                Column(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(top = it.calculateTopPadding())
+                ) {
+                    AnimatedVisibility(visible = list,   enter = fadeIn(
+                        tween(durationMillis = 1000, delayMillis = 1000)
+                        , initialAlpha = 1f
+                    ), exit = fadeOut(tween(easing = LinearEasing))) {
+                        LazyColumn(
+                            modifier = Modifier.fillMaxWidth(),
+                            horizontalAlignment = Alignment.CenterHorizontally,
+                            verticalArrangement = Arrangement.spacedBy(6.dp),
+                            contentPadding = PaddingValues(top = 4.dp)
+                        ) {
+                            quotesData?.let {
+                                items(it) { quote ->
+                                    Quotes(quotesItem = quote, navController, viewModel)
+                                }
+                            }
+                        }
+                    }
+                }
+
+            } else {
+
+                AnimatedVisibility(
+                   visible=!list,
+                    enter = fadeIn(
+                        tween(durationMillis = 1000, delayMillis = 1000),
+                        initialAlpha = 1f
+                    ), exit = fadeOut(tween(easing = LinearEasing))
+                ) {
+                    LazyVerticalStaggeredGrid(
+                        columns = StaggeredGridCells.Fixed(2),
+                        modifier = Modifier.padding(top = it.calculateTopPadding())
+                    ) {
+                        quotesData?.let {
+                            items(it) { quote ->
+                              Quotes(quotesItem = quote, navController,viewModel)
+
+                            }
+                        }
                     }
                 }
             }
         }
     }
+
 }
 
 @Composable
@@ -202,54 +283,94 @@ fun Quotes(quotesItem: QuotesItem, navController: NavController, viewModel: Main
     var icon by remember {
         mutableStateOf(false)
     }
-    Card(
-        modifier = Modifier
-            .wrapContentSize()
-            .padding(all = 6.dp)
-            .clickable { navController.navigate(bottomScreen.SecondScreen.route + "/${quotesItem.quote} /${quotesItem.author}") },
-        elevation = CardDefaults.cardElevation(4.dp)
-    ) {
-        Column(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(all = 12.dp),
-            verticalArrangement = Arrangement.Center,
-            horizontalAlignment = Alignment.CenterHorizontally
-        ) {
+    val context = LocalContext.current
+    val sharedPreferences = context.getSharedPreferences("prefs", Context.MODE_PRIVATE)
 
-            Text(text = quotesItem.quote)
+    val isDarkValue = sharedPreferences.getBoolean("darkMode", false)
+    var switchState by remember {
+        mutableStateOf(isDarkValue)
+    }
 
-            Spacer(modifier = Modifier.height(10.dp))
+    val isFav by remember {
+        mutableStateOf(false)
+    }
+    var favData by remember {
+        mutableStateOf<List<Fav>?>(null)
+    }
+    LaunchedEffect(key1 = isFav) {
+        viewModel.getAllFav()
+    }
 
-            Text(
-                text = quotesItem.author,
-                fontSize = MaterialTheme.typography.titleMedium.fontSize,
-                fontWeight = FontWeight.Bold,
+    val state by viewModel.allFav.collectAsState()
+    when (state) {
+        is ResultState.Error -> {
+            val error = (state as ResultState.Error).error
+            Text(text = error.toString())
+        }
 
-                )
-
-            Spacer(modifier = Modifier.height(10.dp))
-
-            Row(
-                modifier = Modifier.padding(10.dp),
-                verticalAlignment = Alignment.CenterVertically,
-                horizontalArrangement = Arrangement.spacedBy(10.dp)
-            ) {
-                Icon(
-                    imageVector = if (icon) Icons.Default.Favorite else Icons.Outlined.FavoriteBorder,
-                    contentDescription = "Favoritr",
-                    modifier = Modifier.clickable {
-                        val fav = Fav(null, quotesItem.quote, quotesItem.author)
-                        icon = !icon
-                        viewModel.Insert(fav)
-                    })
-                Spacer(modifier = Modifier.width(5.dp))
-                Icon(imageVector = Icons.Outlined.Share, contentDescription = "Share")
-
+        ResultState.Loading -> {
+            Box(modifier = Modifier.fillMaxWidth(), contentAlignment = Alignment.Center) {
+                CircularProgressIndicator()
             }
+        }
 
+        is ResultState.Success -> {
+            val success = (state as ResultState.Success).repository
+            favData = success
         }
     }
+    QuotesApiTheme(darkTheme = switchState) {
+
+        Card(
+            modifier = Modifier
+                .wrapContentSize()
+                .padding(all = 6.dp)
+                .clickable { navController.navigate(bottomScreen.SecondScreen.route + "/${quotesItem.quote} /${quotesItem.author}") },
+            elevation = CardDefaults.cardElevation(4.dp)
+        ) {
+            Column(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(all = 12.dp),
+                verticalArrangement = Arrangement.Center,
+                horizontalAlignment = Alignment.CenterHorizontally
+            ) {
+
+                Text(text = quotesItem.quote)
+
+                Spacer(modifier = Modifier.height(10.dp))
+
+                Text(
+                    text = quotesItem.author,
+                    fontSize = MaterialTheme.typography.titleMedium.fontSize,
+                    fontWeight = FontWeight.Bold,
+
+                    )
+
+                Spacer(modifier = Modifier.height(10.dp))
+
+                Row(
+                    modifier = Modifier.padding(10.dp),
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.spacedBy(10.dp)
+                ) {
+                    Icon(
+                        imageVector = if (icon) Icons.Default.Favorite else Icons.Outlined.FavoriteBorder,
+                        contentDescription = "Favoritr",
+                        modifier = Modifier.clickable {
+                            val fav = Fav(null, quotesItem.quote, quotesItem.author)
+                            icon = !icon
+                            viewModel.Insert(fav)
+                        })
+                    Spacer(modifier = Modifier.width(5.dp))
+                    Icon(imageVector = Icons.Outlined.Share, contentDescription = "Share")
+
+                }
+
+            }
+        }
+    }
+
 }
 
 
@@ -264,6 +385,13 @@ fun FavouriteScreen(navController: NavController) {
 @Composable
 fun BottomFav() {
     val context = LocalContext.current
+    val sharedPreferences = context.getSharedPreferences("prefs", Context.MODE_PRIVATE)
+
+    val isDarkValue = sharedPreferences.getBoolean("darkMode", false)
+    var switchState by remember {
+        mutableStateOf(isDarkValue)
+    }
+
     val db = Room.databaseBuilder(
         context,
         DataBase::class.java,
@@ -303,16 +431,18 @@ fun BottomFav() {
             favData = success
         }
     }
+    QuotesApiTheme(darkTheme = switchState) {
 
-    LazyColumn(
-        modifier = Modifier.fillMaxWidth(),
-        horizontalAlignment = Alignment.CenterHorizontally,
-        verticalArrangement = Arrangement.spacedBy(6.dp),
-        contentPadding = PaddingValues(top = 4.dp)
-    ) {
-        favData?.let {
-            items(it) { fav ->
-                FavItem(fav = fav)
+        LazyColumn(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalAlignment = Alignment.CenterHorizontally,
+            verticalArrangement = Arrangement.spacedBy(6.dp),
+            contentPadding = PaddingValues(top = 4.dp)
+        ) {
+            favData?.let {
+                items(it) { fav ->
+                    FavItem(fav = fav)
+                }
             }
         }
     }
@@ -321,99 +451,120 @@ fun BottomFav() {
 
 @Composable
 fun FavItem(fav: Fav) {
-    Card(
-        modifier = Modifier
-            .wrapContentSize()
-            .padding(all = 6.dp),
-        elevation = CardDefaults.cardElevation(4.dp)
-    ) {
-        Column(
+    val context = LocalContext.current
+    val sharedPreferences = context.getSharedPreferences("prefs", Context.MODE_PRIVATE)
+
+    val isDarkValue = sharedPreferences.getBoolean("darkMode", false)
+    var switchState by remember {
+        mutableStateOf(isDarkValue)
+    }
+    QuotesApiTheme(darkTheme = switchState) {
+        Card(
             modifier = Modifier
-                .fillMaxWidth()
-                .padding(all = 12.dp),
-            verticalArrangement = Arrangement.Center,
-            horizontalAlignment = Alignment.CenterHorizontally
+                .wrapContentSize()
+                .padding(all = 6.dp),
+            elevation = CardDefaults.cardElevation(4.dp)
         ) {
-            Row(
-                verticalAlignment = Alignment.CenterVertically,
-                horizontalArrangement = Arrangement.Center
+            Column(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(all = 12.dp),
+                verticalArrangement = Arrangement.Center,
+                horizontalAlignment = Alignment.CenterHorizontally
             ) {
-                Icon(
-                    imageVector = Icons.Default.FormatQuote,
-                    contentDescription = "",
-                    modifier = Modifier.rotate(180f)
-                )
+                Row(
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.Center
+                ) {
+                    Icon(
+                        imageVector = Icons.Default.FormatQuote,
+                        contentDescription = "",
+                        modifier = Modifier.rotate(180f)
+                    )
+                    Text(
+                        text = fav.titttle,
+                        fontSize = MaterialTheme.typography.bodyMedium.fontSize,
+                        fontWeight = FontWeight.W600
+                    )
+                }
+
+                Spacer(modifier = Modifier.height(14.dp))
+
                 Text(
-                    text = fav.titttle,
-                    fontSize = MaterialTheme.typography.bodyMedium.fontSize,
-                    fontWeight = FontWeight.W600
-                )
+                    text = fav.des,
+                    fontSize = MaterialTheme.typography.titleMedium.fontSize,
+                    fontWeight = FontWeight.Bold,
+
+                    )
+
+
             }
-
-            Spacer(modifier = Modifier.height(14.dp))
-
-            Text(
-                text = fav.des,
-                fontSize = MaterialTheme.typography.titleMedium.fontSize,
-                fontWeight = FontWeight.Bold,
-
-                )
-
-
         }
     }
+
 }
 
 @OptIn(ExperimentalMaterial3Api::class)
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
 @Composable
 fun SettingScreen(navController: NavController) {
-    var switchState by remember {
-        mutableStateOf(false)
-    }
+    val context = LocalContext.current
 
-    Scaffold(
-        topBar = {
-            CenterAlignedTopAppBar(
-                title = {
+    val sharedPreferences = context.getSharedPreferences("prefs", Context.MODE_PRIVATE)
+
+    val isDarkValue = sharedPreferences.getBoolean("darkMode", false)
+
+    var switchState by remember {
+        mutableStateOf(isDarkValue)
+    }
+    QuotesApiTheme(darkTheme = switchState) {
+
+
+        Scaffold(
+            topBar = {
+                CenterAlignedTopAppBar(
+                    title = {
+                        Text(
+                            text = "Setting",
+                            fontSize = MaterialTheme.typography.titleLarge.fontSize,
+                            fontWeight = FontWeight.Bold
+                        )
+                    },
+                    colors = TopAppBarDefaults.topAppBarColors(Color(0XFF3492eb)),
+                    modifier = Modifier.padding(bottom = 10.dp)
+                )
+            }
+        ) {
+            Card(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(
+                        top = it.calculateTopPadding(),
+                        start = 14.dp,
+                        end = 14.dp,
+                        bottom = 14.dp
+                    ),
+                elevation = CardDefaults.cardElevation(4.dp)
+            ) {
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(all = 20.dp),
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.SpaceBetween
+                ) {
                     Text(
-                        text = "Setting",
+                        text = "Dark Theme | $isDarkValue",
                         fontSize = MaterialTheme.typography.titleLarge.fontSize,
                         fontWeight = FontWeight.Bold
                     )
-                },
-                colors = TopAppBarDefaults.topAppBarColors(Color(0XFF3492eb)),
-                modifier = Modifier.padding(bottom = 10.dp)
-            )
-        }
-    ) {
-        Card(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(
-                    top = it.calculateTopPadding(),
-                    start = 14.dp,
-                    end = 14.dp,
-                    bottom = 14.dp
-                ),
-            elevation = CardDefaults.cardElevation(4.dp)
-        ) {
-            Row(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(all = 20.dp),
-                verticalAlignment = Alignment.CenterVertically,
-                horizontalArrangement = Arrangement.SpaceBetween
-            ) {
-                Text(
-                    text = "Dark Theme",
-                    fontSize = MaterialTheme.typography.titleLarge.fontSize,
-                    fontWeight = FontWeight.Bold
-                )
 
-                Switch(checked = switchState, onCheckedChange = {
-                    switchState = it
-                })
+                    Switch(checked = switchState, onCheckedChange = {
+                        switchState = it
+                        sharedPreferences.edit().putBoolean("darkMode", it).apply()
+
+                    })
+                }
             }
         }
     }
