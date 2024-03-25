@@ -23,12 +23,12 @@ class SharedPrefances (
             editor.putBoolean(keyName,value)
             editor.commit()
         }
-    var list get() = prefances.getString(
-        keyName,""
+    var list get() = prefances.getBoolean(
+        keyList,false
 
     )
         set(value) {
-            editor.putString(keyList,value)
+            editor.putBoolean(keyList,value)
             editor.commit()
         }
 

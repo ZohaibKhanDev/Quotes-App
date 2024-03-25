@@ -192,6 +192,12 @@ fun QuoteList(
     var switchState by remember {
         mutableStateOf(isDarkValue)
     }
+    val listPreferences = context.getSharedPreferences("List", Context.MODE_PRIVATE)
+    val isListValue = listPreferences.getBoolean("listmode", false)
+    var icons by remember {
+        mutableStateOf(isListValue)
+    }
+
     QuotesApiTheme(darkTheme = switchState) {
         Scaffold(
             topBar = {
@@ -214,7 +220,12 @@ fun QuoteList(
 
                         Icon(
                             imageVector = if (list) Icons.Default.List else Icons.Default.FormatListNumberedRtl,
-                            contentDescription = "", modifier = Modifier.clickable { list=!list }
+                            contentDescription = "", modifier = Modifier.clickable {
+                                icons = !icons
+                                val gridSection = listPreferences.edit()
+                                gridSection.putBoolean("listmode", icons).apply()
+
+                            }
                         )
                         Icon(imageVector = Icons.Outlined.Search, contentDescription = "")
 
@@ -226,16 +237,17 @@ fun QuoteList(
             },
         ) {
 
-            if (list) {
+            if (icons) {
                 Column(
                     modifier = Modifier
                         .fillMaxWidth()
                         .padding(top = it.calculateTopPadding())
                 ) {
-                    AnimatedVisibility(visible = list,   enter = fadeIn(
-                        tween(durationMillis = 1000, delayMillis = 1000)
-                        , initialAlpha = 1f
-                    ), exit = fadeOut(tween(easing = LinearEasing))) {
+                    AnimatedVisibility(
+                        visible = icons, enter = fadeIn(
+                            tween(durationMillis = 1000, delayMillis = 1000), initialAlpha = 1f
+                        ), exit = fadeOut(tween(easing = LinearEasing))
+                    ) {
                         LazyColumn(
                             modifier = Modifier.fillMaxWidth(),
                             horizontalAlignment = Alignment.CenterHorizontally,
@@ -254,7 +266,7 @@ fun QuoteList(
             } else {
 
                 AnimatedVisibility(
-                   visible=!list,
+                    visible = icons == false,
                     enter = fadeIn(
                         tween(durationMillis = 1000, delayMillis = 1000),
                         initialAlpha = 1f
@@ -266,7 +278,7 @@ fun QuoteList(
                     ) {
                         quotesData?.let {
                             items(it) { quote ->
-                              Quotes(quotesItem = quote, navController,viewModel)
+                                Quotes(quotesItem = quote, navController, viewModel)
 
                             }
                         }
