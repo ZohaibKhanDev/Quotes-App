@@ -22,8 +22,11 @@ import androidx.compose.material.icons.filled.MoreVert
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material.icons.filled.ShoppingCart
+import androidx.compose.material.icons.outlined.Abc
 import androidx.compose.material.icons.outlined.FavoriteBorder
 import androidx.compose.material.icons.outlined.Home
+import androidx.compose.material.icons.outlined.PrivacyTip
+import androidx.compose.material.icons.outlined.PrivateConnectivity
 import androidx.compose.material.icons.outlined.Settings
 import androidx.compose.material.icons.outlined.Share
 import androidx.compose.material.icons.outlined.ShoppingCart
@@ -114,6 +117,12 @@ fun Navigation(navController: NavHostController) {
             composable(bottomScreen.Setting.route) {
                 SettingScreen(navController)
             }
+            composable(bottomScreen.PrivacyScreen.route){
+                PrivacyScreen(navController = navController)
+            }
+            composable(bottomScreen.AboutScreen.route){
+                AboutScreen(navController = navController)
+            }
         }
     }
 
@@ -140,6 +149,19 @@ sealed class bottomScreen(
         "Second",
         selectIcon = Icons.Default.ShoppingCart,
         unselect = Icons.Outlined.ShoppingCart
+    )
+
+    object PrivacyScreen : bottomScreen(
+        "privacy",
+        "privacy",
+        selectIcon = Icons.Outlined.PrivacyTip,
+        unselect = Icons.Outlined.PrivateConnectivity
+    )
+    object AboutScreen : bottomScreen(
+        "About",
+        "About",
+        selectIcon = Icons.Outlined.Abc,
+        unselect = Icons.Outlined.Abc
     )
 
     object Favourite :
@@ -174,7 +196,7 @@ fun BottomNavigation(navController: NavController) {
     var switchState by remember {
         mutableStateOf(isDarkValue)
     }
-    QuotesApiTheme (darkTheme = switchState){
+    QuotesApiTheme(darkTheme = switchState) {
         NavigationBar(contentColor = Color.White) {
             val navStack by navController.currentBackStackEntryAsState()
             val current = navStack?.destination?.route
