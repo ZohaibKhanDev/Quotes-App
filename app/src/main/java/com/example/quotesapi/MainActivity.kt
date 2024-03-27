@@ -31,11 +31,14 @@ import androidx.compose.foundation.lazy.staggeredgrid.LazyVerticalStaggeredGrid
 import androidx.compose.foundation.lazy.staggeredgrid.StaggeredGridCells
 import androidx.compose.foundation.lazy.staggeredgrid.items
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Cancel
+import androidx.compose.material.icons.filled.Clear
 import androidx.compose.material.icons.filled.Favorite
 import androidx.compose.material.icons.filled.FormatListNumberedRtl
 import androidx.compose.material.icons.filled.FormatQuote
 import androidx.compose.material.icons.filled.Home
 import androidx.compose.material.icons.filled.List
+import androidx.compose.material.icons.filled.Search
 import androidx.compose.material.icons.outlined.FavoriteBorder
 import androidx.compose.material.icons.outlined.MoreVert
 import androidx.compose.material.icons.outlined.Search
@@ -48,6 +51,7 @@ import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.SearchBar
 import androidx.compose.material3.Switch
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBarDefaults
@@ -62,6 +66,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.rotate
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.Shadow
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
@@ -193,92 +198,140 @@ fun QuoteList(
     var icons by remember {
         mutableStateOf(isListValue)
     }
-
+    var searchState by remember {
+        mutableStateOf("")
+    }
+    var searchBarState by remember {
+        mutableStateOf(false)
+    }
     QuotesApiTheme(darkTheme = switchState) {
-        Scaffold(
-            topBar = {
-                CenterAlignedTopAppBar(title = {
-                    Text(
-                        text = "Quotes",
-                        fontSize = MaterialTheme.typography.titleLarge.fontSize,
-                        fontWeight = FontWeight.Bold
-                    )
+
+        if (searchBarState) {
+            SearchBar(
+                query = searchState,
+                onQueryChange = {
+                    searchState = it
                 },
-                    colors = TopAppBarDefaults.topAppBarColors(Color(0XFF5EEBFC)),
-                    navigationIcon = {
-                        Icon(
-                            imageVector = Icons.Default.Home,
-                            contentDescription = "",
-                            modifier = Modifier.size(35.dp)
+                onSearch = { bar ->
+                    quotesData?.let { search ->
+                        search.forEach {
+                            it.quote.contains(bar)
+                        }
+
+                    }
+                },
+                active = true,
+                onActiveChange = {
+                },
+                Modifier
+                    .wrapContentWidth()
+                    .padding(12.dp),
+                placeholder = {
+                    Text(text = "Search")
+                },
+                shadowElevation = 4.dp,
+                tonalElevation = 4.dp,
+                trailingIcon = {
+                    Icon(
+                        imageVector = Icons.Default.Clear,
+                        contentDescription = "",
+                        modifier = Modifier.clickable { })
+                }
+            ) {
+
+            }
+
+        } else {
+            Scaffold(
+                topBar = {
+                    CenterAlignedTopAppBar(title = {
+                        Text(
+                            text = "Quotes",
+                            fontSize = MaterialTheme.typography.titleLarge.fontSize,
+                            fontWeight = FontWeight.Bold
                         )
                     },
-                    actions = {
+                        colors = TopAppBarDefaults.topAppBarColors(Color(0XFF5EEBFC)),
+                        navigationIcon = {
+                            Icon(
+                                imageVector = Icons.Default.Home,
+                                contentDescription = "",
+                                modifier = Modifier.size(35.dp)
+                            )
+                        },
+                        actions = {
 
-                        Icon(imageVector = if (list) Icons.Default.List else Icons.Default.FormatListNumberedRtl,
-                            contentDescription = "",
-                            modifier = Modifier.clickable {
-                                icons = !icons
-                                val gridSection = listPreferences.edit()
-                                gridSection.putBoolean("listmode", icons).apply()
+                            Icon(imageVector = if (list) Icons.Default.List else Icons.Default.FormatListNumberedRtl,
+                                contentDescription = "",
+                                modifier = Modifier.clickable {
+                                    icons = !icons
+                                    val gridSection = listPreferences.edit()
+                                    gridSection.putBoolean("listmode", icons).apply()
 
-                            })
-                        Icon(imageVector = Icons.Outlined.Search, contentDescription = "")
+                                })
+                            Spacer(modifier = Modifier.width(8.dp))
+                            Icon(
+                                imageVector = Icons.Default.Search,
+                                contentDescription = "",
+                                modifier = Modifier.clickable { searchBarState = !searchBarState })
+                            Spacer(modifier = Modifier.width(8.dp))
+                            Icon(imageVector = Icons.Outlined.MoreVert, contentDescription = "")
+                            Spacer(modifier = Modifier.width(8.dp))
 
 
-                        Icon(imageVector = Icons.Outlined.MoreVert, contentDescription = "")
+                        })
+                },
+            ) {
 
-
-                    })
-            },
-        ) {
-
-            if (icons) {
-                Column(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(top = it.calculateTopPadding())
-                ) {
-                    AnimatedVisibility(
-                        visible = icons, enter = fadeIn(
-                            tween(durationMillis = 1000, delayMillis = 1000), initialAlpha = 1f
-                        ), exit = fadeOut(tween(easing = LinearEasing))
+                if (icons) {
+                    Column(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(top = it.calculateTopPadding())
                     ) {
-                        LazyColumn(
-                            modifier = Modifier.fillMaxWidth(),
-                            horizontalAlignment = Alignment.CenterHorizontally,
-                            verticalArrangement = Arrangement.spacedBy(6.dp),
-                            contentPadding = PaddingValues(top = 4.dp)
+                        AnimatedVisibility(
+                            visible = icons, enter = fadeIn(
+                                tween(durationMillis = 1000, delayMillis = 1000), initialAlpha = 1f
+                            ), exit = fadeOut(tween(easing = LinearEasing))
                         ) {
-                            quotesData?.let {
-                                items(it) { quote ->
-                                    Quotes(quotesItem = quote, navController, viewModel)
+                            LazyColumn(
+                                modifier = Modifier.fillMaxWidth(),
+                                horizontalAlignment = Alignment.CenterHorizontally,
+                                verticalArrangement = Arrangement.spacedBy(6.dp),
+                                contentPadding = PaddingValues(top = 4.dp)
+                            ) {
+                                quotesData?.let {
+                                    items(it) { quote ->
+                                        Quotes(quotesItem = quote, navController, viewModel)
+                                    }
                                 }
                             }
                         }
                     }
-                }
 
-            } else {
+                } else {
 
-                AnimatedVisibility(
-                    visible = icons == false, enter = fadeIn(
-                        tween(durationMillis = 1000, delayMillis = 1000), initialAlpha = 1f
-                    ), exit = fadeOut(tween(easing = LinearEasing))
-                ) {
-                    LazyVerticalStaggeredGrid(
-                        columns = StaggeredGridCells.Fixed(2),
-                        modifier = Modifier.padding(top = it.calculateTopPadding())
+                    AnimatedVisibility(
+                        visible = icons == false, enter = fadeIn(
+                            tween(durationMillis = 1000, delayMillis = 1000), initialAlpha = 1f
+                        ), exit = fadeOut(tween(easing = LinearEasing))
                     ) {
-                        quotesData?.let {
-                            items(it) { quote ->
-                                Quotes(quotesItem = quote, navController, viewModel)
+                        LazyVerticalStaggeredGrid(
+                            columns = StaggeredGridCells.Fixed(2),
+                            modifier = Modifier.padding(top = it.calculateTopPadding())
+                        ) {
+                            quotesData?.let {
+                                items(it) { quote ->
+                                    Quotes(quotesItem = quote, navController, viewModel)
 
+                                }
                             }
                         }
                     }
                 }
             }
         }
+
     }
 
 }
@@ -450,6 +503,8 @@ fun BottomFav() {
 
 }
 
+@OptIn(ExperimentalMaterial3Api::class)
+@SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
 @Composable
 fun FavItem(fav: Fav) {
     val context = LocalContext.current
@@ -502,8 +557,8 @@ fun FavItem(fav: Fav) {
             }
         }
     }
-
 }
+
 
 @OptIn(ExperimentalMaterial3Api::class)
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
