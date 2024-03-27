@@ -123,6 +123,18 @@ fun Navigation(navController: NavHostController) {
             composable(bottomScreen.AboutScreen.route){
                 AboutScreen(navController = navController)
             }
+
+            composable(bottomScreen.UpgradeScreen.route){
+                UpgradeScreen(navController)
+            }
+
+            composable(bottomScreen.FeatureScreen.route){
+                Feature_Preview(navController)
+            }
+
+            composable(bottomScreen.CommunityScreen.route){
+                Quotes_Community(navController)
+            }
         }
     }
 
@@ -150,6 +162,27 @@ sealed class bottomScreen(
         selectIcon = Icons.Default.ShoppingCart,
         unselect = Icons.Outlined.ShoppingCart
     )
+
+    object UpgradeScreen : bottomScreen(
+        "Upgrade",
+        "Second",
+        selectIcon = Icons.Default.ShoppingCart,
+        unselect = Icons.Outlined.ShoppingCart
+    )
+
+    object FeatureScreen : bottomScreen(
+        "Feature",
+        "Feature",
+        selectIcon = Icons.Default.ShoppingCart,
+        unselect = Icons.Outlined.ShoppingCart
+    )
+    object CommunityScreen : bottomScreen(
+        "Community",
+        "Community",
+        selectIcon = Icons.Default.ShoppingCart,
+        unselect = Icons.Outlined.ShoppingCart
+    )
+
 
     object PrivacyScreen : bottomScreen(
         "privacy",

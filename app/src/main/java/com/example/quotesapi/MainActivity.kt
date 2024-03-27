@@ -68,6 +68,7 @@ import androidx.compose.ui.draw.rotate
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Shadow
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
@@ -488,10 +489,11 @@ fun BottomFav() {
     QuotesApiTheme(darkTheme = switchState) {
 
         LazyColumn(
-            modifier = Modifier.fillMaxWidth(),
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(top = 15.dp, bottom = 20.dp),
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.spacedBy(6.dp),
-            contentPadding = PaddingValues(top = 4.dp)
         ) {
             favData?.let {
                 items(it) { fav ->
@@ -518,13 +520,13 @@ fun FavItem(fav: Fav) {
         Card(
             modifier = Modifier
                 .wrapContentSize()
-                .padding(all = 6.dp),
+                .padding(14.dp, bottom = 14.dp),
             elevation = CardDefaults.cardElevation(4.dp)
         ) {
             Column(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(all = 12.dp),
+                    .padding(all = 14.dp),
                 verticalArrangement = Arrangement.Center,
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
@@ -589,41 +591,220 @@ fun SettingScreen(navController: NavController) {
                 modifier = Modifier.padding(bottom = 10.dp)
             )
         }) {
-            Card(
+            Column(
                 modifier = Modifier
-                    .fillMaxWidth()
+                    .wrapContentWidth()
                     .padding(
-                        top = it.calculateTopPadding(), start = 14.dp, end = 14.dp, bottom = 14.dp
-                    ), elevation = CardDefaults.cardElevation(4.dp)
+                        top = it.calculateTopPadding(),
+                        start = 14.dp,
+                        end = 14.dp,
+                        bottom = 14.dp
+                    ),
+                verticalArrangement = Arrangement.SpaceBetween,
+                horizontalAlignment = Alignment.CenterHorizontally
             ) {
-
-                Row(
+                Card(
                     modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(all = 20.dp),
-                    verticalAlignment = Alignment.CenterVertically,
-                    horizontalArrangement = Arrangement.SpaceBetween
+                        .fillMaxWidth(), elevation = CardDefaults.cardElevation(4.dp)
                 ) {
-                    Text(
-                        text = "Dark Theme | $isDarkValue",
-                        fontSize = MaterialTheme.typography.titleLarge.fontSize,
-                        fontWeight = FontWeight.Bold
-                    )
 
-                    Switch(checked = switchState, onCheckedChange = {
-                        switchState = it
-                        sharedPreferences.edit().putBoolean("darkMode", it).apply()
+                    Row(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(all = 20.dp),
+                        verticalAlignment = Alignment.CenterVertically,
+                        horizontalArrangement = Arrangement.SpaceBetween
+                    ) {
+                        Text(
+                            text = "Dark Theme | $isDarkValue",
+                            fontSize = MaterialTheme.typography.titleLarge.fontSize,
+                            fontWeight = FontWeight.Bold
+                        )
 
-                    })
+                        Switch(checked = switchState, onCheckedChange = {
+                            switchState = it
+                            sharedPreferences.edit().putBoolean("darkMode", it).apply()
+
+                        })
+                    }
+
+
                 }
-
-
             }
+
+
 
             Spacer(modifier = Modifier.height(25.dp))
 
             Column(
                 modifier = Modifier.padding(top = 120.dp),
+                verticalArrangement = Arrangement.Center,
+                horizontalAlignment = Alignment.CenterHorizontally
+            ) {
+                Card(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(
+                            top = it.calculateTopPadding(),
+                            start = 14.dp,
+                            end = 14.dp,
+                            bottom = 14.dp
+                        )
+                        .clickable { navController.navigate(bottomScreen.Favourite.route) },
+                    elevation = CardDefaults.cardElevation(4.dp)
+                ) {
+
+                    Row(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(all = 20.dp),
+                        verticalAlignment = Alignment.CenterVertically,
+                        horizontalArrangement = Arrangement.SpaceBetween
+                    ) {
+
+                        Text(
+                            text = "Your Favourite",
+                            fontSize = MaterialTheme.typography.titleLarge.fontSize,
+                            fontWeight = FontWeight.Bold
+                        )
+
+                    }
+                }
+
+            }
+
+
+
+
+            Spacer(modifier = Modifier.height(25.dp))
+
+            Column(
+                modifier = Modifier.padding(top = 220.dp),
+                verticalArrangement = Arrangement.Center,
+                horizontalAlignment = Alignment.CenterHorizontally
+            ) {
+                Card(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(
+                            top = it.calculateTopPadding(),
+                            start = 14.dp,
+                            end = 14.dp,
+                            bottom = 14.dp
+                        )
+                        .clickable { navController.navigate(bottomScreen.UpgradeScreen.route) },
+                    elevation = CardDefaults.cardElevation(4.dp)
+                ) {
+
+                    Row(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(all = 20.dp),
+                        verticalAlignment = Alignment.CenterVertically,
+                        horizontalArrangement = Arrangement.SpaceBetween
+                    ) {
+
+                        Text(
+                            text = "Upgrade",
+                            fontSize = MaterialTheme.typography.titleLarge.fontSize,
+                            fontWeight = FontWeight.Bold
+                        )
+
+                    }
+                }
+
+            }
+
+
+
+
+
+            Spacer(modifier = Modifier.height(25.dp))
+
+            Column(
+                modifier = Modifier.padding(top = 320.dp),
+                verticalArrangement = Arrangement.Center,
+                horizontalAlignment = Alignment.CenterHorizontally
+            ) {
+                Card(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(
+                            top = it.calculateTopPadding(),
+                            start = 14.dp,
+                            end = 14.dp,
+                            bottom = 14.dp
+                        )
+                        .clickable { navController.navigate(bottomScreen.FeatureScreen.route) },
+                    elevation = CardDefaults.cardElevation(4.dp)
+                ) {
+
+                    Row(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(all = 20.dp),
+                        verticalAlignment = Alignment.CenterVertically,
+                        horizontalArrangement = Arrangement.SpaceBetween
+                    ) {
+
+                        Text(
+                            text = "Feature Preview",
+                            fontSize = MaterialTheme.typography.titleLarge.fontSize,
+                            fontWeight = FontWeight.Bold
+                        )
+
+                    }
+                }
+
+            }
+
+
+
+            Spacer(modifier = Modifier.height(25.dp))
+
+            Column(
+                modifier = Modifier.padding(top = 420.dp),
+                verticalArrangement = Arrangement.Center,
+                horizontalAlignment = Alignment.CenterHorizontally
+            ) {
+                Card(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(
+                            top = it.calculateTopPadding(),
+                            start = 14.dp,
+                            end = 14.dp,
+                            bottom = 14.dp
+                        )
+                        .clickable { navController.navigate(bottomScreen.CommunityScreen.route) },
+                    elevation = CardDefaults.cardElevation(4.dp)
+                ) {
+
+                    Row(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(all = 20.dp),
+                        verticalAlignment = Alignment.CenterVertically,
+                        horizontalArrangement = Arrangement.SpaceBetween
+                    ) {
+
+                        Text(
+                            text = "Quotes Community",
+                            fontSize = MaterialTheme.typography.titleLarge.fontSize,
+                            fontWeight = FontWeight.Bold
+                        )
+
+                    }
+                }
+
+            }
+
+
+
+            Spacer(modifier = Modifier.height(25.dp))
+
+            Column(
+                modifier = Modifier.padding(top = 620.dp),
                 verticalArrangement = Arrangement.Center,
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
@@ -662,7 +843,7 @@ fun SettingScreen(navController: NavController) {
             Spacer(modifier = Modifier.height(25.dp))
 
             Column(
-                modifier = Modifier.padding(top = 220.dp),
+                modifier = Modifier.padding(top = 520.dp),
                 verticalArrangement = Arrangement.Center,
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
@@ -752,7 +933,7 @@ fun PrivacyScreen(navController: NavController) {
                         "\n" +
                         "If you have any questions or concerns about this Privacy Policy or our practices regarding your information, please contact us at contact@quotesapp.com."
             )
-            Spacer(modifier = Modifier.height(22.dp))
+            Spacer(modifier = Modifier.padding(35.dp))
         }
     }
 }
@@ -791,9 +972,35 @@ fun AboutScreen(navController: NavController) {
                         "\n" +
                         "Join the [App Name] community today and embark on a journey of self-discovery, growth, and inspiration. Download our app now and let the transformative power of quotes enrich your life every day. Together, let's ignite the spark of possibility and create a brighter tomorrow, one quote at a time."
             )
-            Spacer(modifier = Modifier.height(22.dp))
+            Spacer(modifier = Modifier.padding(30.dp))
         }
     }
+}
+
+@Composable
+fun UpgradeScreen(navController: NavController) {
+    LazyColumn(
+        modifier = Modifier
+            .fillMaxSize()
+            .padding(30.dp),
+        verticalArrangement = Arrangement.Center,
+        horizontalAlignment = Alignment.CenterHorizontally
+    ) {
+
+        item {
+           AnnotatedString(R.string.upgrade.toString())
+        }
+    }
+}
+
+@Composable
+fun Feature_Preview(navController: NavController) {
+
+}
+
+@Composable
+fun Quotes_Community(navController: NavController) {
+
 }
 
 
