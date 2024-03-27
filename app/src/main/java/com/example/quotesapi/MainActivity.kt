@@ -988,7 +988,35 @@ fun UpgradeScreen(navController: NavController) {
     ) {
 
         item {
-           AnnotatedString(R.string.upgrade.toString())
+            Text(
+                text = "Welcome to the Quotes App Upgrade!\n" +
+                        "\n" +
+                        "Unlock Premium Features\n" +
+                        "\n" +
+                        "Upgrade now to unlock exclusive features and enhance your quote browsing experience.\n" +
+                        "\n" +
+                        "Premium Features Include:\n" +
+                        "\n" +
+                        "Ad-Free Experience: Enjoy uninterrupted browsing with zero advertisements.\n" +
+                        "\n" +
+                        "Unlimited Favorites: Save as many quotes as you want without any restrictions.\n" +
+                        "\n" +
+                        "Customizable Themes: Personalize your app with a variety of beautiful themes.\n" +
+                        "\n" +
+                        "Daily Quote Notifications: Receive inspirational quotes daily to uplift your spirits.\n" +
+                        "\n" +
+                        "Offline Access: Access your favorite quotes even without an internet connection.\n" +
+                        "\n" +
+                        "Why Upgrade?\n" +
+                        "\n" +
+                        "Enhanced Experience: Get rid of distractions and immerse yourself in a seamless browsing experience.\n" +
+                        "\n" +
+                        "Support Development: By upgrading, you support the continuous improvement and maintenance of the Quotes App.\n" +
+                        "\n" +
+                        "Upgrade Now\n" +
+                        "\n" +
+                        "Unlock premium features for only X.XX per month and elevate your quote journey to the next level."
+            )
         }
     }
 }
@@ -996,10 +1024,72 @@ fun UpgradeScreen(navController: NavController) {
 @Composable
 fun Feature_Preview(navController: NavController) {
 
+    Column(
+        modifier = Modifier
+            .fillMaxSize()
+            .padding(30.dp),
+        verticalArrangement = Arrangement.Center,
+        horizontalAlignment = Alignment.CenterHorizontally
+    ) {
+        Text(
+            text = "Welcome to QuoteMaster – the ultimate app designed to elevate your daily routine with a curated collection of wisdom, motivation, and inspiration! Whether you seek a spark of creativity, a dose of motivation, or simply a moment of reflection, QuoteMaster is your go-to companion.\n" +
+                    "\n" +
+                    "Discover Limitless Inspiration:\n" +
+                    "Explore a vast library of handpicked quotes from renowned thinkers, authors, leaders, and celebrities spanning across various categories such as love, life, success, happiness, and more. With daily updates and fresh content, there’s always something new to discover and inspire you.\n" +
+                    "\n" +
+                    "Personalized Experience:\n" +
+                    "Tailor QuoteMaster to your preferences with customizable settings. Favorite the quotes that resonate with you the most, create personalized collections, and set up daily reminders to receive your dose of inspiration at the perfect time.\n" +
+                    "\n" +
+                    "Seamless Sharing:\n" +
+                    "Spread positivity and wisdom effortlessly with QuoteMaster’s easy sharing feature. Share your favorite quotes with friends, family, and social networks to inspire those around you and spark meaningful conversations.\n" +
+                    "\n" +
+                    "Enhanced Accessibility:\n" +
+                    "QuoteMaster is designed for convenience and accessibility. Enjoy a user-friendly interface that makes browsing, saving, and sharing quotes a breeze. Whether you’re on your smartphone, tablet, or desktop, QuoteMaster adapts seamlessly to your device.\n" +
+                    "\n" +
+                    "Stay Motivated Anywhere, Anytime:\n" +
+                    "Whether you’re commuting to work, taking a break between tasks, or winding down before bed, QuoteMaster is there to uplift and inspire you. With offline access, you can enjoy your favorite quotes anytime, anywhere, even without an internet connection.\n" +
+                    "\n" +
+                    "Coming Soon: Community Features!\n" +
+                    "Get ready for even more excitement as QuoteMaster prepares to introduce community features, allowing you to connect with like-minded individuals, share insights, and participate in discussions around your favorite quotes and topics.\n" +
+                    "\n" +
+                    "Get Ready to Be Inspired:\n" +
+                    "With QuoteMaster, inspiration is just a tap away. Elevate your mindset, fuel your creativity, and embark on a journey of personal growth and enlightenment. Download QuoteMaster now and unlock the power of words to transform your life."
+        )
+    }
 }
 
 @Composable
 fun Quotes_Community(navController: NavController) {
+
+    Column(
+        modifier = Modifier
+            .fillMaxSize()
+            .padding(30.dp),
+        verticalArrangement = Arrangement.Center,
+        horizontalAlignment = Alignment.CenterHorizontally
+    ) {
+        Text(
+            text = "\"Quotables: Where Words Inspire, Connect, and Resonate.\"\n" +
+                    "\n" +
+                    "\"Unlocking Wisdom, One Quote at a Time.\"\n" +
+                    "\n" +
+                    "\"Words That Bind: Building Bridges Through Quotes.\"\n" +
+                    "\n" +
+                    "\"Echoes of Insight: Where Every Quote Tells a Story.\"\n" +
+                    "\n" +
+                    "\"Quotidian: Where Daily Quotes Fuel Inspiration.\"\n" +
+                    "\n" +
+                    "\"Inspire, Share, Repeat: The Power of Quotations.\"\n" +
+                    "\n" +
+                    "\"Quotiverse: Where Every Quote Finds its Home.\"\n" +
+                    "\n" +
+                    "\"From Thought to Quote: Uniting Minds Across the Globe.\"\n" +
+                    "\n" +
+                    "\"Quotient: Where Words Multiply Inspiration.\"\n" +
+                    "\n" +
+                    "\"Quotopia: Where Ideas Converge and Quotes Flourish.\""
+        )
+    }
 
 }
 
