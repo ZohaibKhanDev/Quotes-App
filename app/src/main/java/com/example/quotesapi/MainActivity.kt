@@ -3,6 +3,7 @@ package com.example.quotesapi
 import android.annotation.SuppressLint
 import android.content.Context
 import android.os.Bundle
+import android.widget.Toast
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.animation.AnimatedVisibility
@@ -30,8 +31,8 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.staggeredgrid.LazyVerticalStaggeredGrid
 import androidx.compose.foundation.lazy.staggeredgrid.StaggeredGridCells
 import androidx.compose.foundation.lazy.staggeredgrid.items
+import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Cancel
 import androidx.compose.material.icons.filled.Clear
 import androidx.compose.material.icons.filled.Favorite
 import androidx.compose.material.icons.filled.FormatListNumberedRtl
@@ -41,8 +42,9 @@ import androidx.compose.material.icons.filled.List
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.material.icons.outlined.FavoriteBorder
 import androidx.compose.material.icons.outlined.MoreVert
-import androidx.compose.material.icons.outlined.Search
 import androidx.compose.material.icons.outlined.Share
+import androidx.compose.material3.AlertDialog
+import androidx.compose.material3.Button
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.CenterAlignedTopAppBar
@@ -54,6 +56,7 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SearchBar
 import androidx.compose.material3.Switch
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextField
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -66,10 +69,10 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.rotate
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.Shadow
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.input.ImeAction
+import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import androidx.room.Room
@@ -208,8 +211,7 @@ fun QuoteList(
     QuotesApiTheme(darkTheme = switchState) {
 
         if (searchBarState) {
-            SearchBar(
-                query = searchState,
+            SearchBar(query = searchState,
                 onQueryChange = {
                     searchState = it
                 },
@@ -222,8 +224,7 @@ fun QuoteList(
                     }
                 },
                 active = true,
-                onActiveChange = {
-                },
+                onActiveChange = {},
                 Modifier
                     .wrapContentWidth()
                     .padding(12.dp),
@@ -233,12 +234,10 @@ fun QuoteList(
                 shadowElevation = 4.dp,
                 tonalElevation = 4.dp,
                 trailingIcon = {
-                    Icon(
-                        imageVector = Icons.Default.Clear,
+                    Icon(imageVector = Icons.Default.Clear,
                         contentDescription = "",
                         modifier = Modifier.clickable { })
-                }
-            ) {
+                }) {
 
             }
 
@@ -271,8 +270,7 @@ fun QuoteList(
 
                                 })
                             Spacer(modifier = Modifier.width(8.dp))
-                            Icon(
-                                imageVector = Icons.Default.Search,
+                            Icon(imageVector = Icons.Default.Search,
                                 contentDescription = "",
                                 modifier = Modifier.clickable { searchBarState = !searchBarState })
                             Spacer(modifier = Modifier.width(8.dp))
@@ -595,17 +593,13 @@ fun SettingScreen(navController: NavController) {
                 modifier = Modifier
                     .wrapContentWidth()
                     .padding(
-                        top = it.calculateTopPadding(),
-                        start = 14.dp,
-                        end = 14.dp,
-                        bottom = 14.dp
+                        top = it.calculateTopPadding(), start = 14.dp, end = 14.dp, bottom = 14.dp
                     ),
                 verticalArrangement = Arrangement.SpaceBetween,
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
                 Card(
-                    modifier = Modifier
-                        .fillMaxWidth(), elevation = CardDefaults.cardElevation(4.dp)
+                    modifier = Modifier.fillMaxWidth(), elevation = CardDefaults.cardElevation(4.dp)
                 ) {
 
                     Row(
@@ -869,7 +863,8 @@ fun SettingScreen(navController: NavController) {
                     ) {
 
                         Text(
-                            text = "About", fontSize = MaterialTheme.typography.titleLarge.fontSize,
+                            text = "About",
+                            fontSize = MaterialTheme.typography.titleLarge.fontSize,
                             fontWeight = FontWeight.Bold
                         )
 
@@ -891,47 +886,7 @@ fun PrivacyScreen(navController: NavController) {
 
         item {
             Text(
-                text = "At Quotes App, we are committed to protecting your privacy and ensuring the security of your personal information. This Privacy Policy outlines the types of information we collect, how we use it, and the measures we take to safeguard your data.\n" +
-                        "\n" +
-                        "By using Quotes App, you consent to the collection and use of your information as described in this Privacy Policy. If you do not agree with any part of this policy, please refrain from using the app.\n" +
-                        "\n" +
-                        "Information We Collect:\n" +
-                        "\n" +
-                        "Personal Information: When you use Quotes App, we may collect personal information such as your name, email address, and any other information you voluntarily provide.\n" +
-                        "Usage Data: We may collect information about how you use the app, including which features you access and how often you use them.\n" +
-                        "Device Information: We may collect information about your device, including the type of device you use, unique device identifiers, IP address, operating system version, and mobile network information.\n" +
-                        "Cookies and Similar Technologies: Like many websites and mobile applications, we may use cookies and similar technologies to collect information about your usage and preferences.\n" +
-                        "How We Use Your Information:\n" +
-                        "\n" +
-                        "We may use the information we collect for the following purposes:\n" +
-                        "\n" +
-                        "To provide and improve Quotes App and its features.\n" +
-                        "To personalize your experience and deliver content tailored to your interests.\n" +
-                        "To communicate with you, respond to your inquiries, and provide customer support.\n" +
-                        "To analyze usage patterns and trends to enhance the functionality and performance of the app.\n" +
-                        "To prevent fraud and ensure the security of our users and the app.\n" +
-                        "Sharing of Information:\n" +
-                        "\n" +
-                        "We do not sell, trade, or otherwise transfer your personal information to third parties without your consent, except as described below:\n" +
-                        "\n" +
-                        "Service Providers: We may share your information with trusted third-party service providers who assist us in operating Quotes App and providing services to you. These service providers are contractually obligated to use your information only for the purposes of providing services to us and are required to maintain the confidentiality and security of your information.\n" +
-                        "Legal Compliance: We may disclose your information if required to do so by law or in response to valid legal requests, such as subpoenas or court orders.\n" +
-                        "Business Transfers: In the event of a merger, acquisition, or sale of all or a portion of our assets, your information may be transferred to the acquiring entity.\n" +
-                        "Data Security:\n" +
-                        "\n" +
-                        "We take reasonable measures to protect the security of your information and prevent unauthorized access, use, or disclosure. However, please be aware that no method of transmission over the internet or electronic storage is completely secure, and we cannot guarantee the absolute security of your information.\n" +
-                        "\n" +
-                        "Children's Privacy:\n" +
-                        "\n" +
-                        "Quotes App is not intended for use by children under the age of 13. We do not knowingly collect personal information from children under 13. If you are a parent or guardian and believe that your child has provided us with personal information, please contact us immediately, and we will take steps to remove such information from our systems.\n" +
-                        "\n" +
-                        "Changes to this Privacy Policy:\n" +
-                        "\n" +
-                        "We reserve the right to update or modify this Privacy Policy at any time. Any changes will be effective immediately upon posting the revised policy on Quotes App. We encourage you to review this Privacy Policy periodically for any updates.\n" +
-                        "\n" +
-                        "Contact Us:\n" +
-                        "\n" +
-                        "If you have any questions or concerns about this Privacy Policy or our practices regarding your information, please contact us at contact@quotesapp.com."
+                text = "At Quotes App, we are committed to protecting your privacy and ensuring the security of your personal information. This Privacy Policy outlines the types of information we collect, how we use it, and the measures we take to safeguard your data.\n" + "\n" + "By using Quotes App, you consent to the collection and use of your information as described in this Privacy Policy. If you do not agree with any part of this policy, please refrain from using the app.\n" + "\n" + "Information We Collect:\n" + "\n" + "Personal Information: When you use Quotes App, we may collect personal information such as your name, email address, and any other information you voluntarily provide.\n" + "Usage Data: We may collect information about how you use the app, including which features you access and how often you use them.\n" + "Device Information: We may collect information about your device, including the type of device you use, unique device identifiers, IP address, operating system version, and mobile network information.\n" + "Cookies and Similar Technologies: Like many websites and mobile applications, we may use cookies and similar technologies to collect information about your usage and preferences.\n" + "How We Use Your Information:\n" + "\n" + "We may use the information we collect for the following purposes:\n" + "\n" + "To provide and improve Quotes App and its features.\n" + "To personalize your experience and deliver content tailored to your interests.\n" + "To communicate with you, respond to your inquiries, and provide customer support.\n" + "To analyze usage patterns and trends to enhance the functionality and performance of the app.\n" + "To prevent fraud and ensure the security of our users and the app.\n" + "Sharing of Information:\n" + "\n" + "We do not sell, trade, or otherwise transfer your personal information to third parties without your consent, except as described below:\n" + "\n" + "Service Providers: We may share your information with trusted third-party service providers who assist us in operating Quotes App and providing services to you. These service providers are contractually obligated to use your information only for the purposes of providing services to us and are required to maintain the confidentiality and security of your information.\n" + "Legal Compliance: We may disclose your information if required to do so by law or in response to valid legal requests, such as subpoenas or court orders.\n" + "Business Transfers: In the event of a merger, acquisition, or sale of all or a portion of our assets, your information may be transferred to the acquiring entity.\n" + "Data Security:\n" + "\n" + "We take reasonable measures to protect the security of your information and prevent unauthorized access, use, or disclosure. However, please be aware that no method of transmission over the internet or electronic storage is completely secure, and we cannot guarantee the absolute security of your information.\n" + "\n" + "Children's Privacy:\n" + "\n" + "Quotes App is not intended for use by children under the age of 13. We do not knowingly collect personal information from children under 13. If you are a parent or guardian and believe that your child has provided us with personal information, please contact us immediately, and we will take steps to remove such information from our systems.\n" + "\n" + "Changes to this Privacy Policy:\n" + "\n" + "We reserve the right to update or modify this Privacy Policy at any time. Any changes will be effective immediately upon posting the revised policy on Quotes App. We encourage you to review this Privacy Policy periodically for any updates.\n" + "\n" + "Contact Us:\n" + "\n" + "If you have any questions or concerns about this Privacy Policy or our practices regarding your information, please contact us at contact@quotesapp.com."
             )
             Spacer(modifier = Modifier.padding(35.dp))
         }
@@ -948,74 +903,115 @@ fun AboutScreen(navController: NavController) {
     ) {
         item {
             Text(
-                text = "At [Quotes App], we believe in the power of words to inspire, uplift, and transform lives. Our mission is to curate a collection of the most profound, thought-provoking, and motivational quotes from throughout history and across cultures, all in one convenient location. Whether you're seeking a spark of creativity, a dose of encouragement, or simply a moment of reflection, our app is your go-to destination.\n" +
-                        "\n" +
-                        "What Sets Us Apart\n" +
-                        "\n" +
-                        "What makes [App Name] stand out in the crowded landscape of quote apps? It's simple: our commitment to quality and diversity. We handpick each quote with care, ensuring that it resonates with our users on a deep and meaningful level. From ancient wisdom to modern insights, from renowned philosophers to everyday heroes, our collection represents a rich tapestry of human experience.\n" +
-                        "\n" +
-                        "Features\n" +
-                        "\n" +
-                        "Personalized Recommendations: Tailored just for you, our app learns your preferences over time to deliver quotes that match your interests and mood.\n" +
-                        "\n" +
-                        "Save and Share: Found a quote that speaks to you? Save it to your favorites or share it with friends and family on social media, spreading inspiration far and wide.\n" +
-                        "\n" +
-                        "Daily Reminders: Start your day on a positive note with our daily quote reminders, delivered straight to your device.\n" +
-                        "\n" +
-                        "Explore Categories: Dive into specific themes or topics that interest you, whether it's love, courage, success, or happiness.\n" +
-                        "\n" +
-                        "Our Vision\n" +
-                        "\n" +
-                        "At [App Name], we envision a world where everyone has access to the wisdom and encouragement they need to live their best lives. We believe that by harnessing the power of words, we can empower individuals to overcome challenges, pursue their dreams, and make a positive impact on the world around them.\n" +
-                        "\n" +
-                        "Join Our Community\n" +
-                        "\n" +
-                        "Join the [App Name] community today and embark on a journey of self-discovery, growth, and inspiration. Download our app now and let the transformative power of quotes enrich your life every day. Together, let's ignite the spark of possibility and create a brighter tomorrow, one quote at a time."
+                text = "At [Quotes App], we believe in the power of words to inspire, uplift, and transform lives. Our mission is to curate a collection of the most profound, thought-provoking, and motivational quotes from throughout history and across cultures, all in one convenient location. Whether you're seeking a spark of creativity, a dose of encouragement, or simply a moment of reflection, our app is your go-to destination.\n" + "\n" + "What Sets Us Apart\n" + "\n" + "What makes [App Name] stand out in the crowded landscape of quote apps? It's simple: our commitment to quality and diversity. We handpick each quote with care, ensuring that it resonates with our users on a deep and meaningful level. From ancient wisdom to modern insights, from renowned philosophers to everyday heroes, our collection represents a rich tapestry of human experience.\n" + "\n" + "Features\n" + "\n" + "Personalized Recommendations: Tailored just for you, our app learns your preferences over time to deliver quotes that match your interests and mood.\n" + "\n" + "Save and Share: Found a quote that speaks to you? Save it to your favorites or share it with friends and family on social media, spreading inspiration far and wide.\n" + "\n" + "Daily Reminders: Start your day on a positive note with our daily quote reminders, delivered straight to your device.\n" + "\n" + "Explore Categories: Dive into specific themes or topics that interest you, whether it's love, courage, success, or happiness.\n" + "\n" + "Our Vision\n" + "\n" + "At [App Name], we envision a world where everyone has access to the wisdom and encouragement they need to live their best lives. We believe that by harnessing the power of words, we can empower individuals to overcome challenges, pursue their dreams, and make a positive impact on the world around them.\n" + "\n" + "Join Our Community\n" + "\n" + "Join the [App Name] community today and embark on a journey of self-discovery, growth, and inspiration. Download our app now and let the transformative power of quotes enrich your life every day. Together, let's ignite the spark of possibility and create a brighter tomorrow, one quote at a time."
             )
             Spacer(modifier = Modifier.padding(30.dp))
         }
     }
 }
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun UpgradeScreen(navController: NavController) {
-    LazyColumn(
+    var switchState by remember {
+        mutableStateOf(false)
+    }
+    var textState by remember {
+        mutableStateOf("")
+    }
+    val context = LocalContext.current
+    Card(
         modifier = Modifier
-            .fillMaxSize()
-            .padding(30.dp),
-        verticalArrangement = Arrangement.Center,
+            .fillMaxWidth()
+            .padding(17.dp),
+        elevation = CardDefaults.cardElevation(4.dp)
+    ) {
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(14.dp),
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.SpaceBetween
+        ) {
+            Text(
+                text = "Upgrade",
+                fontSize = MaterialTheme.typography.titleLarge.fontSize,
+                fontWeight = FontWeight.Bold
+            )
+
+            Switch(checked = switchState, onCheckedChange = {
+                switchState = it
+            })
+
+        }
+    }
+
+    if (switchState) {
+        AlertDialog(
+            onDismissRequest = { switchState = !switchState }, modifier = Modifier.padding(14.dp)
+        ) {
+            Card(
+                modifier = Modifier
+                    .wrapContentSize()
+                    .padding(14.dp), elevation = CardDefaults.cardElevation(5.dp)
+            ) {
+                Column(
+                    modifier = Modifier
+                        .wrapContentSize()
+                        .padding(14.dp),
+                    verticalArrangement = Arrangement.SpaceBetween,
+                    horizontalAlignment = Alignment.CenterHorizontally
+                ) {
+                    Text(
+                        text = "Account Number",
+                        fontSize = MaterialTheme.typography.titleLarge.fontSize,
+                        fontWeight = FontWeight.Bold
+                    )
+
+                    Spacer(modifier = Modifier.height(7.dp))
+                    TextField(value = textState, onValueChange = {
+                        textState = it
+                    }, label = {
+                        Text(text = "Enter Account Number")
+                    }, keyboardOptions = KeyboardOptions(
+                        autoCorrect = true,
+                        keyboardType = KeyboardType.Number,
+                        imeAction = ImeAction.Done
+                    )
+                    )
+
+                    Button(onClick = {
+                        navController.navigate(bottomScreen.Home.route)
+                        Toast.makeText(
+                           context,
+                            "Your App Is Upgraded",
+                            Toast.LENGTH_SHORT
+
+                        ).show()
+                    }) {
+                        Text(text = "Enter")
+                    }
+                }
+
+            }
+        }
+
+
+    }
+
+
+
+    LazyColumn(
+        modifier = Modifier.padding(15.dp, top = 100.dp, bottom = 80.dp),
+        verticalArrangement = Arrangement.SpaceBetween,
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
 
         item {
             Text(
-                text = "Welcome to the Quotes App Upgrade!\n" +
-                        "\n" +
-                        "Unlock Premium Features\n" +
-                        "\n" +
-                        "Upgrade now to unlock exclusive features and enhance your quote browsing experience.\n" +
-                        "\n" +
-                        "Premium Features Include:\n" +
-                        "\n" +
-                        "Ad-Free Experience: Enjoy uninterrupted browsing with zero advertisements.\n" +
-                        "\n" +
-                        "Unlimited Favorites: Save as many quotes as you want without any restrictions.\n" +
-                        "\n" +
-                        "Customizable Themes: Personalize your app with a variety of beautiful themes.\n" +
-                        "\n" +
-                        "Daily Quote Notifications: Receive inspirational quotes daily to uplift your spirits.\n" +
-                        "\n" +
-                        "Offline Access: Access your favorite quotes even without an internet connection.\n" +
-                        "\n" +
-                        "Why Upgrade?\n" +
-                        "\n" +
-                        "Enhanced Experience: Get rid of distractions and immerse yourself in a seamless browsing experience.\n" +
-                        "\n" +
-                        "Support Development: By upgrading, you support the continuous improvement and maintenance of the Quotes App.\n" +
-                        "\n" +
-                        "Upgrade Now\n" +
-                        "\n" +
-                        "Unlock premium features for only X.XX per month and elevate your quote journey to the next level."
+                text =
+
+                "\n" + "Unlock Premium Features\n" + "\n" + "Upgrade now to unlock exclusive features and enhance your quote browsing experience.\n" + "\n" + "Premium Features Include:\n" + "\n" + "Ad-Free Experience: Enjoy uninterrupted browsing with zero advertisements.\n" + "\n" + "Unlimited Favorites: Save as many quotes as you want without any restrictions.\n" + "\n" + "Customizable Themes: Personalize your app with a variety of beautiful themes.\n" + "\n" + "Daily Quote Notifications: Receive inspirational quotes daily to uplift your spirits.\n" + "\n" + "Offline Access: Access your favorite quotes even without an internet connection.\n" + "\n" + "Why Upgrade?\n" + "\n" + "Enhanced Experience: Get rid of distractions and immerse yourself in a seamless browsing experience.\n" + "\n" + "Support Development: By upgrading, you support the continuous improvement and maintenance of the Quotes App.\n" + "\n" + "Upgrade Now\n" + "\n" + "Unlock premium features for only X.XX per month and elevate your quote journey to the next level."
             )
         }
     }
@@ -1032,28 +1028,7 @@ fun Feature_Preview(navController: NavController) {
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
         Text(
-            text = "Welcome to QuoteMaster – the ultimate app designed to elevate your daily routine with a curated collection of wisdom, motivation, and inspiration! Whether you seek a spark of creativity, a dose of motivation, or simply a moment of reflection, QuoteMaster is your go-to companion.\n" +
-                    "\n" +
-                    "Discover Limitless Inspiration:\n" +
-                    "Explore a vast library of handpicked quotes from renowned thinkers, authors, leaders, and celebrities spanning across various categories such as love, life, success, happiness, and more. With daily updates and fresh content, there’s always something new to discover and inspire you.\n" +
-                    "\n" +
-                    "Personalized Experience:\n" +
-                    "Tailor QuoteMaster to your preferences with customizable settings. Favorite the quotes that resonate with you the most, create personalized collections, and set up daily reminders to receive your dose of inspiration at the perfect time.\n" +
-                    "\n" +
-                    "Seamless Sharing:\n" +
-                    "Spread positivity and wisdom effortlessly with QuoteMaster’s easy sharing feature. Share your favorite quotes with friends, family, and social networks to inspire those around you and spark meaningful conversations.\n" +
-                    "\n" +
-                    "Enhanced Accessibility:\n" +
-                    "QuoteMaster is designed for convenience and accessibility. Enjoy a user-friendly interface that makes browsing, saving, and sharing quotes a breeze. Whether you’re on your smartphone, tablet, or desktop, QuoteMaster adapts seamlessly to your device.\n" +
-                    "\n" +
-                    "Stay Motivated Anywhere, Anytime:\n" +
-                    "Whether you’re commuting to work, taking a break between tasks, or winding down before bed, QuoteMaster is there to uplift and inspire you. With offline access, you can enjoy your favorite quotes anytime, anywhere, even without an internet connection.\n" +
-                    "\n" +
-                    "Coming Soon: Community Features!\n" +
-                    "Get ready for even more excitement as QuoteMaster prepares to introduce community features, allowing you to connect with like-minded individuals, share insights, and participate in discussions around your favorite quotes and topics.\n" +
-                    "\n" +
-                    "Get Ready to Be Inspired:\n" +
-                    "With QuoteMaster, inspiration is just a tap away. Elevate your mindset, fuel your creativity, and embark on a journey of personal growth and enlightenment. Download QuoteMaster now and unlock the power of words to transform your life."
+            text = "Welcome to QuoteMaster – the ultimate app designed to elevate your daily routine with a curated collection of wisdom, motivation, and inspiration! Whether you seek a spark of creativity, a dose of motivation, or simply a moment of reflection, QuoteMaster is your go-to companion.\n" + "\n" + "Discover Limitless Inspiration:\n" + "Explore a vast library of handpicked quotes from renowned thinkers, authors, leaders, and celebrities spanning across various categories such as love, life, success, happiness, and more. With daily updates and fresh content, there’s always something new to discover and inspire you.\n" + "\n" + "Personalized Experience:\n" + "Tailor QuoteMaster to your preferences with customizable settings. Favorite the quotes that resonate with you the most, create personalized collections, and set up daily reminders to receive your dose of inspiration at the perfect time.\n" + "\n" + "Seamless Sharing:\n" + "Spread positivity and wisdom effortlessly with QuoteMaster’s easy sharing feature. Share your favorite quotes with friends, family, and social networks to inspire those around you and spark meaningful conversations.\n" + "\n" + "Enhanced Accessibility:\n" + "QuoteMaster is designed for convenience and accessibility. Enjoy a user-friendly interface that makes browsing, saving, and sharing quotes a breeze. Whether you’re on your smartphone, tablet, or desktop, QuoteMaster adapts seamlessly to your device.\n" + "\n" + "Stay Motivated Anywhere, Anytime:\n" + "Whether you’re commuting to work, taking a break between tasks, or winding down before bed, QuoteMaster is there to uplift and inspire you. With offline access, you can enjoy your favorite quotes anytime, anywhere, even without an internet connection.\n" + "\n" + "Coming Soon: Community Features!\n" + "Get ready for even more excitement as QuoteMaster prepares to introduce community features, allowing you to connect with like-minded individuals, share insights, and participate in discussions around your favorite quotes and topics.\n" + "\n" + "Get Ready to Be Inspired:\n" + "With QuoteMaster, inspiration is just a tap away. Elevate your mindset, fuel your creativity, and embark on a journey of personal growth and enlightenment. Download QuoteMaster now and unlock the power of words to transform your life."
         )
     }
 }
@@ -1069,25 +1044,7 @@ fun Quotes_Community(navController: NavController) {
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
         Text(
-            text = "\"Quotables: Where Words Inspire, Connect, and Resonate.\"\n" +
-                    "\n" +
-                    "\"Unlocking Wisdom, One Quote at a Time.\"\n" +
-                    "\n" +
-                    "\"Words That Bind: Building Bridges Through Quotes.\"\n" +
-                    "\n" +
-                    "\"Echoes of Insight: Where Every Quote Tells a Story.\"\n" +
-                    "\n" +
-                    "\"Quotidian: Where Daily Quotes Fuel Inspiration.\"\n" +
-                    "\n" +
-                    "\"Inspire, Share, Repeat: The Power of Quotations.\"\n" +
-                    "\n" +
-                    "\"Quotiverse: Where Every Quote Finds its Home.\"\n" +
-                    "\n" +
-                    "\"From Thought to Quote: Uniting Minds Across the Globe.\"\n" +
-                    "\n" +
-                    "\"Quotient: Where Words Multiply Inspiration.\"\n" +
-                    "\n" +
-                    "\"Quotopia: Where Ideas Converge and Quotes Flourish.\""
+            text = "\"Quotables: Where Words Inspire, Connect, and Resonate.\"\n" + "\n" + "\"Unlocking Wisdom, One Quote at a Time.\"\n" + "\n" + "\"Words That Bind: Building Bridges Through Quotes.\"\n" + "\n" + "\"Echoes of Insight: Where Every Quote Tells a Story.\"\n" + "\n" + "\"Quotidian: Where Daily Quotes Fuel Inspiration.\"\n" + "\n" + "\"Inspire, Share, Repeat: The Power of Quotations.\"\n" + "\n" + "\"Quotiverse: Where Every Quote Finds its Home.\"\n" + "\n" + "\"From Thought to Quote: Uniting Minds Across the Globe.\"\n" + "\n" + "\"Quotient: Where Words Multiply Inspiration.\"\n" + "\n" + "\"Quotopia: Where Ideas Converge and Quotes Flourish.\""
         )
     }
 
