@@ -6,7 +6,7 @@
 - **All Quotes**
 - **Fav**
 - **Dark Mode**
-- 
+- **Copy Quotes**
 
 
 
