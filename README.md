@@ -7,6 +7,8 @@
 - **Fav**
 - **Dark Mode**
 - **Copy Quotes**
+- **privacy**
+- 
 
 
 
