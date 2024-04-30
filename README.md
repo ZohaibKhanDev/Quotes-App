@@ -8,6 +8,7 @@
 - **Dark Mode**
 - **Copy Quotes**
 - **privacy**
+- **Search and Discover**
 - 
 
 
