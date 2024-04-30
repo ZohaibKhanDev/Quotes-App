@@ -11,6 +11,7 @@
 - **Search and Discover**
 - **Save and Organize**
 - **Share and Connect:**
+- **Random Quote Generator**
 
 
 
