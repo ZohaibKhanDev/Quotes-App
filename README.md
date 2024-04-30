@@ -9,7 +9,7 @@
 - **Copy Quotes**
 - **privacy**
 - **Search and Discover**
-- 
+- **Save and Organize**
 
 
 
