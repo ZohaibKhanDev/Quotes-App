@@ -12,7 +12,7 @@
 - **Save and Organize**
 - **Share and Connect:**
 - **Random Quote Generator**
-
+- **Customization Options**
 
 
 ## 🤝 Connect with Me
