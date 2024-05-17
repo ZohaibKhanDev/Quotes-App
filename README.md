@@ -1,7 +1,7 @@
 # Quotes App
 ## Overview
 
-...
+....
 
 ## 🚀 Key Features
 - **All Quotes**
